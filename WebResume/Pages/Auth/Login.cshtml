@@ -1,8 +1,8 @@
 ﻿@page
-@model WebResume.Pages.Auth.Index
+@model WebResume.Pages.Auth.Login
 
 @{
-    ViewData["Title"] = "Registration";
+    ViewData["Title"] = "Log In";
 }
 
 <form method="post">
@@ -11,13 +11,13 @@
         <div class="mb-3">
             <label asp-for="Email"></label>
             <input asp-for="Email" class="form-control"/>
-            <span asp-validation-for="Email" class="text-danger"></span>
+            <span asp-validation-for="Email"></span>
         </div>
         <div class="mb-3">
             <label asp-for="Password"></label>
             <input asp-for="Password" type="password" class="form-control"/>
-            <span asp-validation-for="Password" class="text-danger"></span>
+            <span asp-validation-for="Password"></span>
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 150px;">Register</button>
+        <button type="submit" class="btn btn-primary" style="width: 150px;">Log In</button>
     </div>
 </form>

@@ -22,4 +22,8 @@ public class MsSqlAppDbContext : DbContext, IAppDbContext{
         var query = await Users.AddAsync(userModel);
         return query.Entity.UserId;
     }
+
+    public async Task<bool> CheckUserRegistration(string email, string password){
+        return await Users.Where(u => u.Email.Equals(email) && u.Password.Equals(password)).AnyAsync();
+    }
 }

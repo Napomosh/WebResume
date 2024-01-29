@@ -8,8 +8,7 @@ public class UserModel{
     [Key]
     public int UserId{ get; set; }
 
-    [Required] 
-    [EmailAddress] 
+    [Required]
     public string Email{ get; set; } = null!;
     
     [Required]
