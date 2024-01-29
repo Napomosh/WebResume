@@ -1,5 +1,7 @@
 using WebResume.DAL;
 using Microsoft.EntityFrameworkCore;
+using WebResume.BL;
+using WebResume.BL.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<MsSqlAppDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IAuth, Auth>();
+builder.Services.AddScoped<IEncrypt, Encrypt>();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSession();
 
 var app = builder.Build();
 
@@ -24,6 +31,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthorization();
 
