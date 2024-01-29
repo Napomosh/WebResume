@@ -18,8 +18,9 @@ public class Auth(MsSqlAppDbContext db, IEncrypt encrypt, IHttpContextAccessor h
         _httpContextAccessor.HttpContext?.Session.SetInt32(AuthConstants.AUTH_SESSION_PARAM_NAME, id);
     }
 
-    public void Login(string email){
-        Login(_db.GetUser(email).Result.UserId);
+    public async void Login(string email){
+        var user = await _db.GetUser(email);
+        Login(user.UserId);
     }
 
     private void HashingPassword(WebResume.Model.UserModel userModel){
@@ -31,17 +32,17 @@ public class Auth(MsSqlAppDbContext db, IEncrypt encrypt, IHttpContextAccessor h
         return encrypt.HashPassword(password, salt);
     }
 
-    public bool CheckRegistration(string? email, string? password){
+    public async Task<bool> CheckRegistration(string? email, string? password){
         if (email == null || password == null)
             return false;
-        var user = _db.GetUser(email);
-        return HashingPassword(password, user.Result.Salt).Equals(user.Result.Password);
+        var user = await _db.GetUser(email);
+        return HashingPassword(password, user.Salt).Equals(user.Password);
     }
 
-    public bool CheckRegistration(string? email){
+    public async Task<bool> IsExistUser(string? email){
         if (email == null)
             return false;
-        var user = _db.GetUser(email);
-        return user.Result.UserId != 0;
+        var user = await _db.GetUser(email);
+        return user.UserId != 0;
     }
 }

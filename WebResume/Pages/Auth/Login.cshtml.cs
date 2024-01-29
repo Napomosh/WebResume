@@ -21,8 +21,11 @@ public class Login(IAuth auth) : PageModel{
         
     }
 
-    public IActionResult OnPost(){
-        if(!ModelState.IsValid || !_auth.CheckRegistration(Email, Password))
+    public async Task<IActionResult> OnPost(){
+        if(!ModelState.IsValid)
+            return Page();
+        var isRegUser = await _auth.CheckRegistration(Email, Password);
+        if (!isRegUser)
             return Page();
         
         _auth.Login(Email);

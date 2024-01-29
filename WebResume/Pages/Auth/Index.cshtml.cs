@@ -23,11 +23,13 @@ public class Index(IAuth auth) : PageModel{
     }
 
     public async Task<IActionResult> OnPost(){
-        if (!_auth.CheckRegistration(Email, Password)){
-            ModelState.AddModelError(AuthConstants.AUTH_ERROR_USER_EXSIST, "User already exist");
-        }
         if(!ModelState.IsValid)
             return Page();
+
+        var isExistUser = await _auth.IsExistUser(Email);
+        if (!isExistUser){
+            ModelState.AddModelError(AuthConstants.AUTH_ERROR_USER_EXSIST, "User already exist");
+        }
         
         await _auth.CreateUser(new UserModel{
             Email = Email!,
