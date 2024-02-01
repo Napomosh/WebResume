@@ -9,7 +9,6 @@ public class Auth(MsSqlAppDbContext db, IEncrypt encrypt, IHttpContextAccessor h
     public async Task<int> CreateUser(WebResume.Model.UserModel userModel){
         HashingPassword(userModel);
         var res = await _db.SaveUser(userModel);
-        await _db.SaveChangesAsync();
         Login(res);
         return res;
     }
@@ -39,10 +38,10 @@ public class Auth(MsSqlAppDbContext db, IEncrypt encrypt, IHttpContextAccessor h
         return HashingPassword(password, user.Salt).Equals(user.Password);
     }
 
-    public async Task<bool> IsExistUser(string? email){
+    public async Task<int?> IsExistUser(string? email){
         if (email == null)
-            return false;
+            return null;
         var user = await _db.GetUser(email);
-        return user.UserId != 0;
+        return user.UserId != 0 ? user.UserId : null;
     }
 }

@@ -27,9 +27,8 @@ public class Index(IAuth auth) : PageModel{
             return Page();
 
         var isExistUser = await _auth.IsExistUser(Email);
-        if (!isExistUser){
+        if (isExistUser != null)
             ModelState.AddModelError(AuthConstants.AUTH_ERROR_USER_EXSIST, "User already exist");
-        }
         
         await _auth.CreateUser(new UserModel{
             Email = Email!,

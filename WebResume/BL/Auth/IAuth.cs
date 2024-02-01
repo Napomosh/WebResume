@@ -5,5 +5,5 @@ public interface IAuth{
     void Login(int idUser);
     void Login(string email);
     Task<bool> CheckRegistration(string? email, string? password);
-    Task<bool> IsExistUser(string? email);
+    Task<int?> IsExistUser(string? email);
 }

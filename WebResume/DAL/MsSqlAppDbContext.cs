@@ -20,7 +20,8 @@ public class MsSqlAppDbContext : DbContext, IAppDbContext{
 
     public async Task<int> SaveUser(UserModel userModel){
         var query = await Users.AddAsync(userModel);
-        return query.Entity.UserId;
+        await SaveChangesAsync();
+        return userModel.UserId;
     }
 
     public async Task<bool> CheckUserRegistration(string email, string password){
