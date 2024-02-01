@@ -2,8 +2,7 @@
 
 public interface IAuth{
     Task<int> CreateUser(WebResume.Model.UserModel userModel);
-    void Login(int idUser);
-    void Login(string email);
     Task<bool> CheckRegistration(string? email, string? password);
     Task<int?> IsExistUser(string? email);
+    Task<bool> Login(string email, string password);
 }

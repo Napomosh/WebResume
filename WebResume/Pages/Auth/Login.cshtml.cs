@@ -24,11 +24,12 @@ public class Login(IAuth auth) : PageModel{
     public async Task<IActionResult> OnPost(){
         if(!ModelState.IsValid)
             return Page();
-        var isRegUser = await _auth.CheckRegistration(Email, Password);
-        if (!isRegUser)
-            return Page();
         
-        _auth.Login(Email);
+        bool loginResult = await _auth.Login(Email, Password);
+        if(!loginResult){
+            ModelState.AddModelError("Incorrect auth data", "Login or password is incorrect");
+            return Page();
+        }
         return RedirectToPage("/Index");
     }
 }

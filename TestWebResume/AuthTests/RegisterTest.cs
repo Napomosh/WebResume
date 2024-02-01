@@ -2,7 +2,7 @@ using System.Transactions;
 using TestWebResume.Helpers;
 using WebResume.Model;
 
-namespace TestWebResume;
+namespace TestWebResume.AuthTests;
 
 public class RegisterTest : BaseTest{
     [SetUp]

@@ -9,19 +9,10 @@ public class Auth(MsSqlAppDbContext db, IEncrypt encrypt, IHttpContextAccessor h
     public async Task<int> CreateUser(WebResume.Model.UserModel userModel){
         HashingPassword(userModel);
         var res = await _db.SaveUser(userModel);
-        Login(res);
+        WriteUserIdInSession(res);
         return res;
     }
-
-    public void Login(int id){
-        _httpContextAccessor.HttpContext?.Session.SetInt32(AuthConstants.AUTH_SESSION_PARAM_NAME, id);
-    }
-
-    public async void Login(string email){
-        var user = await _db.GetUser(email);
-        Login(user.UserId);
-    }
-
+    
     private void HashingPassword(WebResume.Model.UserModel userModel){
         userModel.Salt = Guid.NewGuid().ToString();
         userModel.Password = HashingPassword(userModel.Password, userModel.Salt);
@@ -43,5 +34,27 @@ public class Auth(MsSqlAppDbContext db, IEncrypt encrypt, IHttpContextAccessor h
             return null;
         var user = await _db.GetUser(email);
         return user.UserId != 0 ? user.UserId : null;
+    }
+
+    public async Task<bool> Login(string email, string password){
+        var isUserExist = await IsExistUser(email);
+        if (isUserExist == null)
+            return false;
+        var isUserReg = await CheckRegistration(email, password);
+        if (!isUserReg)
+            return false;
+        
+        WriteUserIdInSession(email);
+        return true; 
+    }
+
+
+    private void WriteUserIdInSession(int id){
+        _httpContextAccessor.HttpContext?.Session.SetInt32(AuthConstants.AUTH_SESSION_PARAM_NAME, id);
+    }
+
+    private async void WriteUserIdInSession(string email){
+        var user = await _db.GetUser(email);
+        WriteUserIdInSession(user.UserId);
     }
 }

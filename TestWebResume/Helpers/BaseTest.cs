@@ -12,7 +12,7 @@ public class BaseTest{
     protected readonly IHttpContextAccessor _httpContextAccessor = new HttpContextAccessor();
     protected readonly IAuth _auth; 
 
-    public BaseTest(){
+    protected BaseTest(){
         var optionsBuilder = new DbContextOptionsBuilder<MsSqlAppDbContext>();
         optionsBuilder.UseSqlServer(Constants.CONNECTION_STRING);
         _db = new MsSqlAppDbContext(optionsBuilder.Options);
