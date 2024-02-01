@@ -1,0 +1,32 @@
+﻿@page
+@model WebResume.Pages.Profile.Index
+
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<form method="post" enctype="multipart/form-data">
+    <div class="border p-3 mt-4">
+        <div asp-validation-summary="All"></div>
+        <div class="mb-3">
+            <label asp-for="ProfileName"></label>
+            <input asp-for="ProfileName" class="form-control"/>
+            <span asp-validation-for="ProfileName"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="FirstName"></label>
+            <input asp-for="FirstName" class="form-control"/>
+            <span asp-validation-for="FirstName"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="LastName"></label>
+            <input asp-for="LastName" class="form-control"/>
+            <span asp-validation-for="LastName"></span>
+        </div>
+        <div>
+            <input type="file" name="file"/>
+        </div>
+        <button>Log In</button>
+    </div>
+</form>

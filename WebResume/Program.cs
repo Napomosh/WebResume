@@ -2,6 +2,7 @@ using WebResume.DAL;
 using Microsoft.EntityFrameworkCore;
 using WebResume.BL;
 using WebResume.BL.Auth;
+using WebResume.BL.FileManagers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddScoped<IEncrypt, Encrypt>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSession();
+builder.Services.AddSingleton<IImageIOManager, ImageIOManager>();
 
 var app = builder.Build();
 

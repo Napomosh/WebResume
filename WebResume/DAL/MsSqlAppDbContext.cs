@@ -8,6 +8,8 @@ public class MsSqlAppDbContext : DbContext, IAppDbContext{
         
     }
     public DbSet<UserModel> Users{ get; init; }
+    
+    public DbSet<ProfileModel> Profiles{ get; init; }
 
 
     public async Task<UserModel> GetUser(string email){
