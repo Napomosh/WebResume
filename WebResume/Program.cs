@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<MsSqlAppDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSingleton<IDbSession, DbSession>();
+builder.Services.AddSingleton<IDbUser, DbUser>();
 builder.Services.AddScoped<IAuth, Auth>();
 builder.Services.AddScoped<IEncrypt, Encrypt>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();

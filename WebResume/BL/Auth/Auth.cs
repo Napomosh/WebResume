@@ -2,13 +2,13 @@
 
 namespace WebResume.BL.Auth;
 
-public class Auth(MsSqlAppDbContext db, IEncrypt encrypt, IHttpContextAccessor httpContextAccessor) : IAuth{
-    private readonly MsSqlAppDbContext _db = db;
+public class Auth(IDbUser dbUserUser, IEncrypt encrypt, IHttpContextAccessor httpContextAccessor) : IAuth{
+    private readonly IDbUser _dbUser = dbUserUser;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     
     public async Task<int> CreateUser(WebResume.Model.UserModel userModel){
         HashingPassword(userModel);
-        var res = await _db.SaveUser(userModel);
+        var res = await _dbUser.SaveUser(userModel);
         WriteUserIdInSession(res);
         return res;
     }
@@ -25,14 +25,14 @@ public class Auth(MsSqlAppDbContext db, IEncrypt encrypt, IHttpContextAccessor h
     public async Task<bool> CheckRegistration(string? email, string? password){
         if (email == null || password == null)
             return false;
-        var user = await _db.GetUser(email);
+        var user = await _dbUser.GetUser(email);
         return HashingPassword(password, user.Salt).Equals(user.Password);
     }
 
     public async Task<int?> IsExistUser(string? email){
         if (email == null)
             return null;
-        var user = await _db.GetUser(email);
+        var user = await _dbUser.GetUser(email);
         return user.UserId != 0 ? user.UserId : null;
     }
 
@@ -54,7 +54,7 @@ public class Auth(MsSqlAppDbContext db, IEncrypt encrypt, IHttpContextAccessor h
     }
 
     private async void WriteUserIdInSession(string email){
-        var user = await _db.GetUser(email);
+        var user = await _dbUser.GetUser(email);
         WriteUserIdInSession(user.UserId);
     }
 }

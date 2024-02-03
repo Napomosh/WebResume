@@ -7,7 +7,7 @@ using WebResume.DAL;
 namespace TestWebResume.Helpers;
 
 public class BaseTest{
-    protected readonly MsSqlAppDbContext _db;
+    protected readonly DbUser _db;
     protected readonly IEncrypt _enc = new Encrypt();
     protected readonly IHttpContextAccessor _httpContextAccessor = new HttpContextAccessor();
     protected readonly IAuth _auth; 
@@ -15,7 +15,7 @@ public class BaseTest{
     protected BaseTest(){
         var optionsBuilder = new DbContextOptionsBuilder<MsSqlAppDbContext>();
         optionsBuilder.UseSqlServer(Constants.CONNECTION_STRING);
-        _db = new MsSqlAppDbContext(optionsBuilder.Options);
+        _db = new DbUser(optionsBuilder.Options);
         
         _auth = new Auth(_db, _enc, _httpContextAccessor);
     }
