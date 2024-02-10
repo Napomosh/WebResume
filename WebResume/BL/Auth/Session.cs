@@ -9,15 +9,15 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
     private SessionModel? _sessionModel = null;
 
     public async Task<int> SetUserId(int id){
-        var sessionObj = await GetSession();
+        var sessionObj = await Get();
         sessionObj.UserId = id;
         sessionObj.SessionId = Guid.NewGuid();  
         CreateSessionCookie(sessionObj.SessionId);
-        await _dbSession.CreateSession(sessionObj);
+        await _dbSession.Create(sessionObj);
         return id;
     }
 
-    public async Task<SessionModel> GetSession(){
+    private async Task<SessionModel> Get(){
         if (_sessionModel != null) return _sessionModel;
         
         Guid sessionId;
@@ -28,27 +28,27 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
             sessionId = Guid.Parse(cookie.Value.Value);
         }
         else{
-            sessionObj = await CreateSession();
+            sessionObj = await Create();
             CreateSessionCookie(sessionObj.SessionId);
             return sessionObj;
         }
 
-        sessionObj = await _dbSession.GetSession(sessionId);
+        sessionObj = await _dbSession.Get(sessionId);
         if (sessionObj != null) return sessionObj;
         
-        sessionObj = await CreateSession();
+        sessionObj = await Create();
         CreateSessionCookie(sessionObj.SessionId);
         _sessionModel = sessionObj;
         return sessionObj;
     }
     
     public async Task<int?> GetUserId(){
-        var sessionObj = await GetSession();
+        var sessionObj = await Get();
         return sessionObj?.UserId;
     }
 
     public async Task<bool> IsLoggedIn(){
-        var sessionObj = await GetSession();
+        var sessionObj = await Get();
         return sessionObj?.UserId != 0;
     }
     
@@ -63,13 +63,13 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
             AuthConstants.AUTH_SESSION_COOKIE_NAME, sessionId.ToString(), options);
     }
 
-    private async Task<SessionModel> CreateSession(){
+    private async Task<SessionModel> Create(){
         var newSession = new SessionModel(){
             SessionId = Guid.NewGuid(),
             CreatedDateTime = DateTime.Now,
             LastAccessedDateTime = DateTime.Now
         };
-        await _dbSession.CreateSession(newSession);
+        await _dbSession.Create(newSession);
         return newSession;
     }
 }

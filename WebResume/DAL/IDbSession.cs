@@ -3,7 +3,7 @@
 namespace WebResume.DAL;
 
 public interface IDbSession{
-    Task<SessionModel?> GetSession(Guid sessionId);
-    Task<Guid> CreateSession(SessionModel session);
-    Task<int> UpdateSession(SessionModel session);
+    Task<SessionModel?> Get(Guid sessionId);
+    Task<Guid> Create(SessionModel session);
+    Task<int> Update(SessionModel session);
 }

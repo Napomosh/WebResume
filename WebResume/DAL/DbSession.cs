@@ -5,25 +5,25 @@ using WebResume.Model;
 namespace WebResume.DAL;
 
 public class DbSession(DbContextOptions<MsSqlAppDbContext> options) : MsSqlAppDbContext(options), IDbSession{
-    public async Task<SessionModel?> GetSession(Guid sessionId){
+    public async Task<SessionModel?> Get(Guid sessionId){
         var sessionRes = await UserSessions.Where(s => s.SessionId == sessionId).FirstOrDefaultAsync();
         return sessionRes;
     }
     
-    public async Task<Guid> CreateSession(SessionModel session){
+    public async Task<Guid> Create(SessionModel session){
         var creationRes = await UserSessions.AddAsync(session);
         await SaveChangesAsync();
         return session.SessionId;
     }
     
-    public async Task<int> UpdateSession(SessionModel session){
+    public async Task<int> Update(SessionModel session){
         var tmpSessionObj = await UserSessions.Where(s => s.SessionId == session.SessionId).FirstOrDefaultAsync();
         if (tmpSessionObj != null)
-            UpdateSessionFields(session, tmpSessionObj);
+            UpdateFields(session, tmpSessionObj);
         return await SaveChangesAsync();
     }
 
-    private static void UpdateSessionFields(SessionModel session, SessionModel tmpSession){
+    private static void UpdateFields(SessionModel session, SessionModel tmpSession){
         tmpSession.SessionData = session.SessionData;
         tmpSession.CreatedDateTime = session.CreatedDateTime;
         tmpSession.LastAccessedDateTime = session.LastAccessedDateTime;
