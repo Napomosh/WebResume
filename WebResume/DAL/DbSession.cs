@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebResume.BL.Auth;
 using WebResume.Model;
 
 namespace WebResume.DAL;

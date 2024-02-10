@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WebResume.BL;
 using WebResume.BL.Auth;
 using WebResume.BL.FileManagers;
+using ISession = WebResume.BL.Auth.ISession;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,14 +11,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<MsSqlAppDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddSingleton<IDbSession, DbSession>();
-builder.Services.AddSingleton<IDbUser, DbUser>();
+builder.Services.AddScoped<IDbSession, DbSession>();
+builder.Services.AddScoped<IDbUser, DbUser>();
 builder.Services.AddScoped<IAuth, Auth>();
 builder.Services.AddScoped<IEncrypt, Encrypt>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddScoped<ISession, Session>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddSession();
 builder.Services.AddSingleton<IImageIOManager, ImageIOManager>();
+builder.Services.AddScoped<IDbSession, DbSession>();
 
 var app = builder.Build();
 
@@ -35,7 +37,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseSession();
 
 app.UseAuthorization();
 

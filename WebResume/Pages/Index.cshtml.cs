@@ -8,8 +8,9 @@ public class IndexModel(ILogger<IndexModel> logger, ICurrentUser currentUser) : 
     private readonly ILogger<IndexModel> _logger = logger;
     private readonly  ICurrentUser _currentUser = currentUser;
 
-    public bool IsLogged(){
-        return _currentUser.IsLoggedIn();
+    public async Task<bool> IsLogged(){
+        var result = await _currentUser.IsLoggedIn();
+        return result;
     }
     public void OnGet(){
         

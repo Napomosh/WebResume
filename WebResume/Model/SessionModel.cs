@@ -5,7 +5,7 @@ namespace WebResume.Model;
 
 public class SessionModel{
     [Key]
-    public Guid SessionId{ get; init; }
+    public Guid SessionId{ get; set; }
     
     public string? SessionData{ get; set; }
 
@@ -16,6 +16,5 @@ public class SessionModel{
     public DateTime LastAccessedDateTime{ get; set; }
 
     [Required] 
-    [ForeignKey("UserId")]
-    public int? UserId{ get; init; } = null;
+    public int UserId{ get; set; }
 }

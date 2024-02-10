@@ -10,7 +10,7 @@
 </div>
 
 @{
-    if (Model.IsLogged()){
+    if (Model.IsLogged().Result){
         <h1>Logged in</h1>
     }
     else{

@@ -2,14 +2,13 @@
 
 namespace WebResume.BL.Auth;
 
-public class Auth(IDbUser dbUserUser, IEncrypt encrypt, IHttpContextAccessor httpContextAccessor) : IAuth{
+public class Auth(IDbUser dbUserUser, IEncrypt encrypt, ISession session) : IAuth{
     private readonly IDbUser _dbUser = dbUserUser;
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     
     public async Task<int> CreateUser(WebResume.Model.UserModel userModel){
         HashingPassword(userModel);
         var res = await _dbUser.SaveUser(userModel);
-        WriteUserIdInSession(res);
+        await session.SetUserId(res);
         return res;
     }
     
@@ -48,13 +47,8 @@ public class Auth(IDbUser dbUserUser, IEncrypt encrypt, IHttpContextAccessor htt
         return true; 
     }
 
-
-    private void WriteUserIdInSession(int id){
-        _httpContextAccessor.HttpContext?.Session.SetInt32(AuthConstants.AUTH_SESSION_PARAM_NAME, id);
-    }
-
     private async void WriteUserIdInSession(string email){
         var user = await _dbUser.GetUser(email);
-        WriteUserIdInSession(user.UserId);
+        await session.SetUserId(user.UserId);
     }
 }
