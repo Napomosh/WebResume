@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebResume.BL.Auth;
+using WebResume.BL.Exception;
 using WebResume.Model;
 
 namespace WebResume.Pages.Auth;
@@ -17,7 +19,6 @@ public class Index(IAuth auth) : PageModel{
     [BindProperty]
     [Required(ErrorMessage = "Password mustn't be empty")]
     public string? Password{ get; set; }
-    
     public void OnGet(){
         
     }
@@ -25,15 +26,20 @@ public class Index(IAuth auth) : PageModel{
     public async Task<IActionResult> OnPost(){
         if(!ModelState.IsValid)
             return Page();
-
-        var isExistUser = await _auth.IsExistUser(Email);
-        if (isExistUser != null)
-            ModelState.AddModelError(AuthConstants.AUTH_ERROR_USER_EXSIST, "User already exist");
-        
-        await _auth.CreateUser(new UserModel{
-            Email = Email!,
-            Password = Password!
-        });
+        try{
+            await _auth.Register(new UserModel{
+                Email = Email!,
+                Password = Password!
+            });
+        }
+        catch (DuplicateEmailException e){
+            ModelState.AddModelError("Duplicate email", "This email is already exist");
+            return Page();
+        }
+        catch{
+            ModelState.AddModelError("Unknown error with duplicate email", "Unknown error with duplicate email");
+            return Page();
+        }
         
         return RedirectToPage("/Index");
     }

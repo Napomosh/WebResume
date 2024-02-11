@@ -1,8 +1,10 @@
-﻿namespace WebResume.BL.Auth;
+﻿using WebResume.Model;
+
+namespace WebResume.BL.Auth;
 
 public interface IAuth{
-    Task<int> CreateUser(WebResume.Model.UserModel userModel);
+    Task<int> Register(UserModel userModel);
     Task<bool> CheckRegistration(string? email, string? password);
-    Task<int?> IsExistUser(string? email);
-    Task<bool> Login(string email, string password);
+    Task<bool> IsExistUser(string? email);
+    Task Login(string email, string password);
 }

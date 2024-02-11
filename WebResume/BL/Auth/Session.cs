@@ -24,7 +24,7 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
         SessionModel? sessionObj;
         var cookie = _httpContextAccessor?.HttpContext?.Request.Cookies.FirstOrDefault
             (c => c.Key == AuthConstants.AUTH_SESSION_COOKIE_NAME);
-        if(cookie != null && cookie.Value.Value != null){
+        if(cookie != null){
             sessionId = Guid.Parse(cookie.Value.Value);
         }
         else{
@@ -50,6 +50,11 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
     public async Task<bool> IsLoggedIn(){
         var sessionObj = await Get();
         return sessionObj?.UserId != 0;
+    }
+    
+    public async Task Lock(){
+        var sessionObj = await Get();
+        await _dbSession.Lock(sessionObj.SessionId);
     }
     
     private void CreateSessionCookie(Guid sessionId){

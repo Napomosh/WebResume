@@ -1,5 +1,6 @@
 using System.Transactions;
 using TestWebResume.Helpers;
+using WebResume.BL.Exception;
 using WebResume.Model;
 
 namespace TestWebResume.AuthTests;
@@ -14,12 +15,13 @@ public class RegisterTest : BaseTest{
         using (TransactionScope scope = Helper.CreateTransactionScope()){
             string testEmail = Guid.NewGuid().ToString() + "@test.com";
             var resEmailChecking = await _auth.IsExistUser(testEmail);
-            Assert.IsNull(resEmailChecking);
+            Assert.IsFalse(resEmailChecking);
 
-            int userId = await _auth.CreateUser(new UserModel{
+            var userId = await _auth.Register(new UserModel{
                 Email = testEmail,
                 Password = "test"
             });
+            
             Assert.Greater(userId, 0);
             
             var resEmailRegister = await _auth.CheckRegistration(testEmail, "test");
@@ -27,6 +29,13 @@ public class RegisterTest : BaseTest{
             
             resEmailChecking = await _auth.IsExistUser(testEmail);
             Assert.IsNotNull(resEmailChecking);
+
+            Assert.Throws<DuplicateEmailException>(delegate{
+                _auth.Register(new UserModel{
+                    Email = testEmail,
+                    Password = "test"
+                }).GetAwaiter().GetResult();
+            });
         }
     }
 }

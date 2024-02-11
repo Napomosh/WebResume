@@ -1,5 +1,6 @@
 ﻿using System.Transactions;
 using TestWebResume.Helpers;
+using WebResume.BL.Exception;
 using WebResume.Model;
 
 namespace TestWebResume.AuthTests;
@@ -14,28 +15,23 @@ public class LoginTest : BaseTest{
         using (TransactionScope scope = Helper.CreateTransactionScope()){
             string testEmail = Guid.NewGuid().ToString() + "@test.com";
             string testPassword = "test";
+            
+            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmail, testPassword).GetAwaiter().GetResult(); });
 
-            var resLogin = await _auth.Login(testEmail, testPassword);
-            Assert.IsFalse(resLogin);
-
-            await _auth.CreateUser(new UserModel{
+            await _auth.Register(new UserModel{
                 Email = testEmail,
                 Password = testPassword
             });
             
-            resLogin = await _auth.Login(testEmail, testPassword);
-            Assert.IsTrue(resLogin);
+            Assert.DoesNotThrow(delegate { _auth.Login(testEmail, testPassword).GetAwaiter().GetResult(); });
             
             string testPasswordNew = Guid.NewGuid().ToString();
-            resLogin = await _auth.Login(testEmail, testPasswordNew);
-            Assert.IsFalse(resLogin);
+            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmail, testPasswordNew).GetAwaiter().GetResult(); });
             
             string testEmailNew = Guid.NewGuid().ToString() + "@test.com";
-            resLogin = await _auth.Login(testEmailNew, testPassword);
-            Assert.IsFalse(resLogin);
-        
-            resLogin = await _auth.Login(testEmailNew, testPasswordNew);
-            Assert.IsFalse(resLogin);
+            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmailNew, testPassword).GetAwaiter().GetResult(); });
+            
+            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmailNew, testPasswordNew).GetAwaiter().GetResult(); });
         }
     }
 }

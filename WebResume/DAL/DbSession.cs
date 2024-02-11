@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Html;
+using Microsoft.EntityFrameworkCore;
 using WebResume.BL.Auth;
 using WebResume.Model;
 
@@ -11,7 +12,7 @@ public class DbSession(DbContextOptions<MsSqlAppDbContext> options) : MsSqlAppDb
     }
     
     public async Task<Guid> Create(SessionModel session){
-        var creationRes = await UserSessions.AddAsync(session);
+        await UserSessions.AddAsync(session);
         await SaveChangesAsync();
         return session.SessionId;
     }
@@ -21,6 +22,14 @@ public class DbSession(DbContextOptions<MsSqlAppDbContext> options) : MsSqlAppDb
         if (tmpSessionObj != null)
             UpdateFields(session, tmpSessionObj);
         return await SaveChangesAsync();
+    }
+
+    public async Task Lock(Guid sessionId){
+        await using (var transaction = await Database.BeginTransactionAsync()){
+            string sqlCommand = $"select SessionId from UserSessions with (UPDLOCK ROWLOCK) where SessionId = '{sessionId}'";
+            await Database.ExecuteSqlRawAsync(sqlCommand);
+            await transaction.CommitAsync();
+        }
     }
 
     private static void UpdateFields(SessionModel session, SessionModel tmpSession){

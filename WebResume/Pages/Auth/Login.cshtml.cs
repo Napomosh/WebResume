@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebResume.BL.Auth;
+using WebResume.BL.Exception;
 
 namespace WebResume.Pages.Auth;
 
@@ -24,12 +25,19 @@ public class Login(IAuth auth) : PageModel{
     public async Task<IActionResult> OnPost(){
         if(!ModelState.IsValid)
             return Page();
-        
-        bool loginResult = await _auth.Login(Email, Password);
-        if(!loginResult){
+
+        try{
+            await _auth.Login(Email, Password);
+        }
+        catch (AuthorizationException e){
             ModelState.AddModelError("Incorrect auth data", "Login or password is incorrect");
             return Page();
         }
+        catch{
+            ModelState.AddModelError("Unknown auth error", "");
+            return Page();
+        }
+        
         return RedirectToPage("/Index");
     }
 }
