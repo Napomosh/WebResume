@@ -14,7 +14,7 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
         sessionObj.UserId = id;
         sessionObj.SessionId = Guid.NewGuid();
         sessionObj.UserTokenId = null;
-        CreateSessionCookie(AuthConstants.AUTH_SESSION_COOKIE_NAME, sessionObj.SessionId, 30);
+        CreateSessionCookie(AuthConstants.AUTH_SESSION_COOKIE_NAME, sessionObj.SessionId, 24);
         await _dbSession.Create(sessionObj);
         return id;
     }
@@ -33,7 +33,7 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
         sessionObj = await _dbSession.Get(sessionId);
         if (sessionObj == null){
             sessionObj = await Create();
-            CreateSessionCookie(AuthConstants.AUTH_SESSION_COOKIE_NAME, sessionObj.SessionId, 30);
+            CreateSessionCookie(AuthConstants.AUTH_SESSION_COOKIE_NAME, sessionObj.SessionId, 24);
         }
         _sessionModel = sessionObj;
         return sessionObj;
@@ -52,7 +52,7 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
     public async Task SetTokenId(Guid guid){
         var sessionObj = await Get();
         sessionObj.UserTokenId = guid;
-        CreateSessionCookie(AuthConstants.AUTH_REMEMBER_ME_COOKIE_NAME, guid, 100000000);
+        CreateSessionCookie(AuthConstants.AUTH_REMEMBER_ME_COOKIE_NAME, guid, 120);
         await _dbSession.Create(sessionObj);
     }
 

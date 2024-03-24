@@ -13,12 +13,12 @@ public class WebCookie(IHttpContextAccessor httpContextAccessor) : IWebCookie{
             name, value, options);
     }
 
-    public void Add(string name, string value, int days = 0){
+    public void Add(string name, string value, int hours = 0){
         CookieOptions options = new CookieOptions{
             Path = "/",
         };
-        if(days > 0)
-            options.Expires = DateTimeOffset.Now.AddSeconds(days);
+        if(hours > 0)
+            options.Expires = DateTimeOffset.Now.AddHours(hours);
         httpContextAccessor?.HttpContext?.Response.Cookies.Append(
             name, value, options);
     }

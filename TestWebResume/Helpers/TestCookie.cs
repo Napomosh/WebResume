@@ -6,7 +6,7 @@ namespace TestWebResume.Helpers;
     {
         private Dictionary<string, string> _cookies = new Dictionary<string, string>();
 
-        public void Add(string cookieName, string value, int days = 0)
+        public void Add(string cookieName, string value, int hours = 0)
         {
             _cookies.Add(cookieName, value);
         }

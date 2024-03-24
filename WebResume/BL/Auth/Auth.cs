@@ -53,7 +53,7 @@ public class Auth(IDbUser dbUser, IEncrypt encrypt, ISession session, IWebCookie
 
         if (rememberMe){
             Guid tokenGuid = await _dbUserToken.Create(user.UserId);
-            webCookie.AddSecure(AuthConstants.AUTH_REMEMBER_ME_COOKIE_NAME, tokenGuid.ToString(), 1000000000);
+            webCookie.AddSecure(AuthConstants.AUTH_REMEMBER_ME_COOKIE_NAME, tokenGuid.ToString(), 120);
         }
         await session.SetUserId(user.UserId); 
     }
