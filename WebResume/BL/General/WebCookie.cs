@@ -1,14 +1,14 @@
 ﻿namespace WebResume.BL.General;
 
 public class WebCookie(IHttpContextAccessor httpContextAccessor) : IWebCookie{
-    public void AddSecure(string name, string value, int days = 0){
+    public void AddSecure(string name, string value, int hours = 0){
         CookieOptions options = new CookieOptions{
             Path = "/",
             HttpOnly = true,
             Secure = true,
         };
-        if(days > 0)
-            options.Expires = DateTimeOffset.Now.AddSeconds(days);
+        if(hours > 0)
+            options.Expires = DateTimeOffset.Now.AddHours(hours);
         httpContextAccessor?.HttpContext?.Response.Cookies.Append(
             name, value, options);
     }

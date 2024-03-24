@@ -2,11 +2,11 @@
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using WebResume.BL.FileManagers;
+using WebResume.Utils;
 
 namespace WebResume.Pages.Profile;
 
-public class Index(IImageIOManager imgManager) : PageModel{
+public class Index : PageModel{
     [BindProperty]
     [Required(ErrorMessage = "Profile name cant be empty")]
     [Display(Name = "Profile Name")]
@@ -37,8 +37,9 @@ public class Index(IImageIOManager imgManager) : PageModel{
             ModelState.AddModelError("Null image", "Your image is incorrect");
             return Page();
         }
-        await imgManager.UploadImage(imgData);
-        
+
+        string fileName = ImageIOManager.CreateImageNameInDirectory(imgData.FileName);
+        await ImageIOManager.UploadImage(imgData, fileName);
         return RedirectToPage("../Index");
     }
 }
