@@ -18,6 +18,11 @@
             <input asp-for="Password" type="password" class="form-control"/>
             <span asp-validation-for="Password"></span>
         </div>
+        <div class="mb-3">
+            <label asp-for="RememberMe"></label>
+            <input asp-for="RememberMe" type="checkbox" value="true"></input>
+            <span asp-validation-for="RememberMe"></span>
+        </div>
         <button type="submit" class="btn btn-primary" style="width: 150px;">Log In</button>
     </div>
 </form>

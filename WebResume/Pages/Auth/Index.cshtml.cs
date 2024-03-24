@@ -19,6 +19,9 @@ public class Index(IAuth auth) : PageModel{
     [BindProperty]
     [Required(ErrorMessage = "Password mustn't be empty")]
     public string? Password{ get; set; }
+    
+   
+    
     public void OnGet(){
         
     }

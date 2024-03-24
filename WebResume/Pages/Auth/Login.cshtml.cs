@@ -6,7 +6,7 @@ using WebResume.BL.Exception;
 
 namespace WebResume.Pages.Auth;
 
-public class Login(IAuth auth) : PageModel{
+public class Login(IAuth auth, ICurrentUser currentUser) : PageModel{
     private readonly IAuth _auth = auth;
     
     [BindProperty]
@@ -18,8 +18,15 @@ public class Login(IAuth auth) : PageModel{
     [Required(ErrorMessage = "Password mustn't be empty")]
     public string Password{ get; set; }
     
-    public void OnGet(){
-        
+    [BindProperty]
+    [Display(Name = "Запомни меня")]
+    public bool RememberMe{ get; set; }
+    
+    
+    public async Task<IActionResult> OnGet(){
+        if(await currentUser.IsLoggedIn())
+            return RedirectToPage("/Index");
+        return Page();
     }
 
     public async Task<IActionResult> OnPost(){
@@ -27,7 +34,8 @@ public class Login(IAuth auth) : PageModel{
             return Page();
 
         try{
-            await _auth.Login(Email, Password);
+            await _auth.Login(Email, Password, RememberMe);
+            
         }
         catch (AuthorizationException e){
             ModelState.AddModelError("Incorrect auth data", "Login or password is incorrect");

@@ -24,14 +24,6 @@ public class DbSession(DbContextOptions<MsSqlAppDbContext> options) : MsSqlAppDb
         return await SaveChangesAsync();
     }
 
-    public async Task Lock(Guid sessionId){
-        await using (var transaction = await Database.BeginTransactionAsync()){
-            string sqlCommand = $"select SessionId from UserSessions with (UPDLOCK ROWLOCK) where SessionId = '{sessionId}'";
-            await Database.ExecuteSqlRawAsync(sqlCommand);
-            await transaction.CommitAsync();
-        }
-    }
-
     private static void UpdateFields(SessionModel session, SessionModel tmpSession){
         tmpSession.SessionData = session.SessionData;
         tmpSession.CreatedDateTime = session.CreatedDateTime;

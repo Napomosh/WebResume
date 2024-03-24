@@ -20,7 +20,7 @@ public class BaseTest{
         optionsBuilder.UseSqlServer(Constants.CONNECTION_STRING);
         _db = new DbUser(optionsBuilder.Options);
         _dbSession = new DbSession(optionsBuilder.Options);
-        _session = new Session(_httpContextAccessor, _dbSession);
-        _auth = new Auth(_db, _enc, _session);
+        //_session = new Session(_httpContextAccessor, _dbSession);
+        //_auth = new Auth(_db, _enc, _session);
     }
 }

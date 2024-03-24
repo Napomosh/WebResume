@@ -10,4 +10,5 @@ public class MsSqlAppDbContext : DbContext, IAppDbContext{
     protected DbSet<UserModel> Users{ get; init; }
     protected DbSet<ProfileModel> Profiles{ get; init; }
     protected DbSet<SessionModel> UserSessions{ get; init; }
+    protected DbSet<UserTokenModel> UserTokens{ get; init; }
 }

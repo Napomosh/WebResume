@@ -1,9 +1,10 @@
-﻿using WebResume.DAL;
+﻿using WebResume.BL.General;
+using WebResume.DAL;
 using WebResume.Model;
 
 namespace WebResume.BL.Auth;
 
-public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSession): ISession{
+public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSession, IWebCookie webCookie): ISession{
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     private readonly IDbSession _dbSession = dbSession;
     private SessionModel? _sessionModel = null;
@@ -11,8 +12,9 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
     public async Task<int> SetUserId(int id){
         var sessionObj = await Get();
         sessionObj.UserId = id;
-        sessionObj.SessionId = Guid.NewGuid();  
-        CreateSessionCookie(sessionObj.SessionId);
+        sessionObj.SessionId = Guid.NewGuid();
+        sessionObj.UserTokenId = null;
+        CreateSessionCookie(AuthConstants.AUTH_SESSION_COOKIE_NAME, sessionObj.SessionId, 30);
         await _dbSession.Create(sessionObj);
         return id;
     }
@@ -22,22 +24,17 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
         
         Guid sessionId;
         SessionModel? sessionObj;
-        var cookie = _httpContextAccessor?.HttpContext?.Request.Cookies.FirstOrDefault
-            (c => c.Key == AuthConstants.AUTH_SESSION_COOKIE_NAME);
-        if(cookie != null){
-            sessionId = Guid.Parse(cookie.Value.Value);
-        }
-        else{
-            sessionObj = await Create();
-            CreateSessionCookie(sessionObj.SessionId);
-            return sessionObj;
-        }
-
-        sessionObj = await _dbSession.Get(sessionId);
-        if (sessionObj != null) return sessionObj;
+        string? cookie = webCookie.Get(AuthConstants.AUTH_SESSION_COOKIE_NAME);
+        if(cookie != null)
+            sessionId = Guid.Parse(cookie);
+        else
+            sessionId = Guid.NewGuid();
         
-        sessionObj = await Create();
-        CreateSessionCookie(sessionObj.SessionId);
+        sessionObj = await _dbSession.Get(sessionId);
+        if (sessionObj == null){
+            sessionObj = await Create();
+            CreateSessionCookie(AuthConstants.AUTH_SESSION_COOKIE_NAME, sessionObj.SessionId, 30);
+        }
         _sessionModel = sessionObj;
         return sessionObj;
     }
@@ -51,21 +48,17 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
         var sessionObj = await Get();
         return sessionObj?.UserId != 0;
     }
-    
-    public async Task Lock(){
+
+    public async Task SetTokenId(Guid guid){
         var sessionObj = await Get();
-        await _dbSession.Lock(sessionObj.SessionId);
+        sessionObj.UserTokenId = guid;
+        CreateSessionCookie(AuthConstants.AUTH_REMEMBER_ME_COOKIE_NAME, guid, 100000000);
+        await _dbSession.Create(sessionObj);
     }
-    
-    private void CreateSessionCookie(Guid sessionId){
-        CookieOptions options = new CookieOptions{
-            Path = "/",
-            HttpOnly = true,
-            Secure = true
-        };
-        _httpContextAccessor?.HttpContext?.Response.Cookies.Delete(AuthConstants.AUTH_SESSION_COOKIE_NAME);
-        _httpContextAccessor?.HttpContext?.Response.Cookies.Append(
-            AuthConstants.AUTH_SESSION_COOKIE_NAME, sessionId.ToString(), options);
+
+    private void CreateSessionCookie(string name, Guid sessionId, int days = 0){
+        webCookie.Delete(name);
+        webCookie.AddSecure(name, sessionId.ToString(), days);
     }
 
     private async Task<SessionModel> Create(){

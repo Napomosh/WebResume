@@ -1,19 +1,23 @@
 ﻿using WebResume.BL.Exception;
+using WebResume.BL.General;
 using WebResume.DAL;
 using WebResume.Model;
 
 namespace WebResume.BL.Auth;
 
-public class Auth(IDbUser dbUserUser, IEncrypt encrypt, ISession session) : IAuth{
-    private readonly IDbUser _dbUser = dbUserUser;
+public class Auth(IDbUser dbUser, IEncrypt encrypt, ISession session, IWebCookie webCookie,
+    IDbUserToken dbUserToken) : IAuth{
+    
+    private readonly IDbUser _dbUser = dbUser;
+    private readonly IDbUserToken _dbUserToken = dbUserToken;
 
     public async Task<int> Register(UserModel userModel){
-        await session.Lock();
-        if (await IsExistUser(userModel.Email))
+        if (IsExistUser(userModel))
             throw new DuplicateEmailException();
         var res = await CreateUser(userModel);
         return res;
     }
+    
     public async Task<bool> CheckRegistration(string? email, string? password){
         if (email == null || password == null)
             return false;
@@ -21,23 +25,34 @@ public class Auth(IDbUser dbUserUser, IEncrypt encrypt, ISession session) : IAut
         return HashingPassword(password, user.Salt).Equals(user.Password);
     }
 
+    public bool CheckRegistration(UserModel? user, string? password){
+        if (user == null || password == null)
+            return false;
+        return HashingPassword(password, user.Salt).Equals(user.Password);
+    }
+    
     public async Task<bool> IsExistUser(string? email){
         if (email == null)
             return false;
         var user = await _dbUser.GetUser(email);
+        return user.UserId != 0 ? true : false;
+    }
+    public bool IsExistUser(UserModel? user){
+        if (user == null)
+            return false;
         return user?.UserId != 0;
     }
 
-    public async Task Login(string email, string password){
-        if (!await IsExistUser(email) || !await CheckRegistration(email, password)) 
-            throw new AuthorizationException();
-        
-        WriteUserIdInSession(email);
-    }
-
-    private async void WriteUserIdInSession(string email){
+    public async Task Login(string email, string password, bool rememberMe ){
         var user = await _dbUser.GetUser(email);
-        await session.SetUserId(user.UserId);
+        if (!IsExistUser(user) || !CheckRegistration(user, password)) 
+            throw new AuthorizationException();
+
+        if (rememberMe){
+            Guid tokenGuid = await _dbUserToken.Create(user.UserId);
+            webCookie.AddSecure(AuthConstants.AUTH_REMEMBER_ME_COOKIE_NAME, tokenGuid.ToString(), 1000000000);
+        }
+        await session.SetUserId(user.UserId); 
     }
     
     private async Task<int> CreateUser(UserModel userModel){
