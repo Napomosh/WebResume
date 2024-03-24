@@ -19,7 +19,7 @@ public class Session(IHttpContextAccessor httpContextAccessor, IDbSession dbSess
         return id;
     }
 
-    private async Task<SessionModel> Get(){
+    public async Task<SessionModel> Get(){
         if (_sessionModel != null) return _sessionModel;
         
         Guid sessionId;

@@ -16,22 +16,22 @@ public class LoginTest : BaseTest{
             string testEmail = Guid.NewGuid().ToString() + "@test.com";
             string testPassword = "test";
             
-            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmail, testPassword).GetAwaiter().GetResult(); });
+            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmail, testPassword, false).GetAwaiter().GetResult(); });
 
             await _auth.Register(new UserModel{
                 Email = testEmail,
                 Password = testPassword
             });
             
-            Assert.DoesNotThrow(delegate { _auth.Login(testEmail, testPassword).GetAwaiter().GetResult(); });
+            Assert.DoesNotThrow(delegate { _auth.Login(testEmail, testPassword, true).GetAwaiter().GetResult(); });
             
             string testPasswordNew = Guid.NewGuid().ToString();
-            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmail, testPasswordNew).GetAwaiter().GetResult(); });
+            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmail, testPasswordNew, true).GetAwaiter().GetResult(); });
             
             string testEmailNew = Guid.NewGuid().ToString() + "@test.com";
-            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmailNew, testPassword).GetAwaiter().GetResult(); });
+            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmailNew, testPassword, true).GetAwaiter().GetResult(); });
             
-            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmailNew, testPasswordNew).GetAwaiter().GetResult(); });
+            Assert.Throws<AuthorizationException>(delegate { _auth.Login(testEmailNew, testPasswordNew, true).GetAwaiter().GetResult(); });
         }
     }
 }

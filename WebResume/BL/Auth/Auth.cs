@@ -12,7 +12,7 @@ public class Auth(IDbUser dbUser, IEncrypt encrypt, ISession session, IWebCookie
     private readonly IDbUserToken _dbUserToken = dbUserToken;
 
     public async Task<int> Register(UserModel userModel){
-        if (IsExistUser(userModel))
+        if (IsExistUser(userModel).Result)
             throw new DuplicateEmailException();
         var res = await CreateUser(userModel);
         return res;
@@ -34,18 +34,21 @@ public class Auth(IDbUser dbUser, IEncrypt encrypt, ISession session, IWebCookie
     public async Task<bool> IsExistUser(string? email){
         if (email == null)
             return false;
+        // TODO Reduce accesses to DB
+        // 1. we get user from DB (1 access)
+        // 2. we call check exist user (2 access)
         var user = await _dbUser.GetUser(email);
         return user.UserId != 0 ? true : false;
     }
-    public bool IsExistUser(UserModel? user){
+    public async Task<bool> IsExistUser(UserModel? user){
         if (user == null)
             return false;
-        return user?.UserId != 0;
+       return await IsExistUser(user.Email);
     }
 
     public async Task Login(string email, string password, bool rememberMe ){
         var user = await _dbUser.GetUser(email);
-        if (!IsExistUser(user) || !CheckRegistration(user, password)) 
+        if (!IsExistUser(user).Result || !CheckRegistration(user, password)) 
             throw new AuthorizationException();
 
         if (rememberMe){

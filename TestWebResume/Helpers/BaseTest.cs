@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using WebResume.BL.Auth;
+using WebResume.BL.General;
 using WebResume.DAL;
-using ISession = WebResume.BL.Auth.ISession;
 
 namespace TestWebResume.Helpers;
 
@@ -13,14 +12,18 @@ public class BaseTest{
     protected readonly IHttpContextAccessor _httpContextAccessor = new HttpContextAccessor();
     protected readonly IAuth _auth;
     protected readonly IDbSession _dbSession;
-    protected readonly ISession _session;
+    protected readonly WebResume.BL.Auth.ISession _session;
+    protected IWebCookie _webCookie;
+    protected IDbUserToken _dbUserToken;
 
     protected BaseTest(){
         var optionsBuilder = new DbContextOptionsBuilder<MsSqlAppDbContext>();
         optionsBuilder.UseSqlServer(Constants.CONNECTION_STRING);
+        _webCookie = new TestCookie();
         _db = new DbUser(optionsBuilder.Options);
         _dbSession = new DbSession(optionsBuilder.Options);
-        //_session = new Session(_httpContextAccessor, _dbSession);
-        //_auth = new Auth(_db, _enc, _session);
+        _dbUserToken = new DbUserToken(optionsBuilder.Options);
+        _session = new Session(_httpContextAccessor, _dbSession, _webCookie);
+        _auth = new Auth(_db, _enc, _session, _webCookie, _dbUserToken);
     }
 }
