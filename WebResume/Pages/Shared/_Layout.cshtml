@@ -25,12 +25,7 @@
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Auth/Index">Registration</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Auth/Login">Log in</a>
-                    </li>
+                    @await Component.InvokeAsync("MainMenu")
                 </ul>
             </div>
         </div>

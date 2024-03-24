@@ -1,0 +1,17 @@
+﻿@model bool
+
+@{
+    if (Model){
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-page="Profile/Index">Profile</a>
+            </li>
+    }
+    else{
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-page="Auth/Index">Registration</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-page="Auth/Login">Log in</a>
+        </li>
+    }
+}
